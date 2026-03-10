@@ -1,5 +1,7 @@
 package com.example.SpringbootCore.controller;
 
+import com.example.SpringbootCore.dto.request.ProductRequest;
+import com.example.SpringbootCore.dto.response.ProductResponse;
 import com.example.SpringbootCore.entity.Product;
 import com.example.SpringbootCore.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -19,27 +21,37 @@ public class ProductController {
 
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
 
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public Product GetProductByID(@PathVariable  long id){
+    public ProductResponse GetProductByID(@PathVariable  long id){
 
         return productService.getProductById(id);
     }
 
     @PostMapping
-    public Product CreateProduct(@RequestBody Product product){
+    public ProductResponse CreateProduct(@RequestBody ProductRequest productRequest){
 
-        return productService.createProduct(product);
+        return productService.createProduct(productRequest);
     }
 
     @PutMapping("/{id}")
-    public Product UpdateProduct(@PathVariable long id , @RequestBody Product product){
+    public ProductResponse UpdateProduct(@PathVariable long id , @RequestBody Product product){
 
         return productService.updateProduct(id, product);
+    }
+
+    @GetMapping("/search")
+    public List<ProductResponse> SearchProducts(@RequestParam String name){
+        return productService.getProductsByName(name);
+    }
+
+    @GetMapping("/searchByCategory")
+    public List<ProductResponse> searchByCategory(@RequestParam String Category){
+        return productService.getProductsByCategory(Category);
     }
 
     @DeleteMapping("/{id}")
