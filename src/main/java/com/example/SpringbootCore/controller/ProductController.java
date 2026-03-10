@@ -24,13 +24,13 @@ public class ProductController {
 
 
     @GetMapping
-    public List<ProductResponse> getAllProducts() {
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
 
-        return productService.getAllProducts();
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @GetMapping("/{id}")
-    public ProductResponse GetProductByID(@PathVariable  long id){
+    public ProductResponse GetProductByID(@Valid @PathVariable  long id){
 
         return productService.getProductById(id);
     }
@@ -48,24 +48,19 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public List<ProductResponse> SearchProducts(@RequestParam String name){
-        return productService.getProductsByName(name);
+    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam String name){
+        return ResponseEntity.ok(productService.getProductsByName(name));
     }
 
     @GetMapping("/searchByCategory")
-    public List<ProductResponse> searchByCategory(@RequestParam String Category){
-        return productService.getProductsByCategory(Category);
+    public ResponseEntity<List<ProductResponse>> searchByCategory(@Valid @RequestParam String Category){
+        return ResponseEntity.ok(productService.getProductsByCategory(Category));
     }
 
     @DeleteMapping("/{id}")
-    public String DeleteProduct(@PathVariable long id){
-        boolean deleted = productService.deleteProduct(id);
-        if (deleted) {
-            return "Product with ID " + id + " deleted successfully.";
-        } else {
-            return "Product with ID " + id + " not found.";
-        }
-
+    public ResponseEntity<Void> DeleteProduct(@PathVariable long id){
+       productService.deleteProduct(id);
+       return ResponseEntity.noContent().build();
 
     }
 }
