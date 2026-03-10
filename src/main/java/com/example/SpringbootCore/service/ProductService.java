@@ -84,12 +84,12 @@ public class ProductService {
         );
     }
 
-    public ProductResponse updateProduct(long id, Product updatedProduct){
+    public ProductResponse updateProduct(long id, ProductRequest request) {
             Product existingProduct = productRepository.findById(id).orElse(null);
             if (existingProduct != null) {
-                existingProduct.setName(updatedProduct.getName());
-                existingProduct.setPrice(updatedProduct.getPrice());
-                existingProduct.setCategory(updatedProduct.getCategory());
+                existingProduct.setName(request.getName());
+                existingProduct.setPrice(request.getPrice());
+                existingProduct.setCategory(request.getCategory());
                 return new ProductResponse(
                         existingProduct.getId(),
                         existingProduct.getName(),

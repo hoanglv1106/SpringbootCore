@@ -42,9 +42,9 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse>  UpdateProduct(@Valid @PathVariable long id , @RequestBody Product product){
+    public ResponseEntity<ProductResponse>  UpdateProduct( @PathVariable long id ,@Valid @RequestBody ProductRequest productRequest){
 
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+        return ResponseEntity.ok(productService.updateProduct(id, productRequest)) ;
     }
 
     @GetMapping("/search")
