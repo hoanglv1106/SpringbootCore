@@ -1,9 +1,14 @@
 package com.example.SpringbootCore.dto.request;
 
-public class ProductRequest {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
+public class ProductRequest {
+    @NotBlank(message = "Product name must not be blank")
     private String name;
+    @Positive(message = "Price must be greater than zero")
     private double price;
+    @NotBlank(message = "Category must not be blank")
     private String category;
 
     public ProductRequest() {}

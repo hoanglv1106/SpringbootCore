@@ -4,6 +4,9 @@ import com.example.SpringbootCore.dto.request.ProductRequest;
 import com.example.SpringbootCore.dto.response.ProductResponse;
 import com.example.SpringbootCore.entity.Product;
 import com.example.SpringbootCore.service.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -33,15 +36,15 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponse CreateProduct(@RequestBody ProductRequest productRequest){
+    public ResponseEntity<ProductResponse>  CreateProduct(@Valid @RequestBody ProductRequest productRequest){
 
-        return productService.createProduct(productRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(productRequest));
     }
 
     @PutMapping("/{id}")
-    public ProductResponse UpdateProduct(@PathVariable long id , @RequestBody Product product){
+    public ResponseEntity<ProductResponse>  UpdateProduct(@Valid @PathVariable long id , @RequestBody Product product){
 
-        return productService.updateProduct(id, product);
+        return ResponseEntity.ok(productService.updateProduct(id, product));
     }
 
     @GetMapping("/search")
