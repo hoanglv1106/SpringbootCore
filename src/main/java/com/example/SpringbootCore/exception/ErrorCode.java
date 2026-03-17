@@ -9,11 +9,19 @@ public enum ErrorCode {
     INVALID_PRICE(1003, "Price must be greater than 0", HttpStatus.BAD_REQUEST),
     INVALID_PRODUCT_NAME(1004, "Product name must not be blank", HttpStatus.BAD_REQUEST),
 
+    // User errors
+    USER_NOT_FOUND(2001, "User not found", HttpStatus.NOT_FOUND),
+    USER_ALREADY_EXISTS(2002, "User already exists", HttpStatus.CONFLICT),
+    INVALID_CREDENTIALS(2002, "Invalid username or password", HttpStatus.UNAUTHORIZED),
+
     // General errors
     VALIDATION_FAILED(4000, "Validation failed", HttpStatus.BAD_REQUEST),
     INVALID_REQUEST(9001, "Invalid request", HttpStatus.BAD_REQUEST),
     RESOURCE_NOT_FOUND(9002, "Resource not found", HttpStatus.NOT_FOUND),
     INTERNAL_ERROR(9999, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+
 
     private final int code;
     private final String message;

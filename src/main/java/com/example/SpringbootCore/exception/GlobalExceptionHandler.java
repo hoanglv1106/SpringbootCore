@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -48,6 +49,19 @@ public class GlobalExceptionHandler {
         body.put("message", message);
         return ResponseEntity.status(errorCode.getHttpStatus()).body(body);
 
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("code", 403);
+        body.put("status", 403);
+        body.put("error", "FORBIDDEN");
+        body.put("message", "You do not have permission to access this resource");
+
+        return ResponseEntity.status(403).body(body);
     }
 
 

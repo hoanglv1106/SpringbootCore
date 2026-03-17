@@ -6,11 +6,11 @@ import com.example.SpringbootCore.entity.Product;
 import com.example.SpringbootCore.exception.AppException;
 import com.example.SpringbootCore.exception.ErrorCode;
 import com.example.SpringbootCore.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.lang.Long;
 
 
 @Service
@@ -23,15 +23,15 @@ public class ProductService {
 
     }
 
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAllBy().stream()
+    public Page<ProductResponse> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable)
                 .map(Product -> new ProductResponse(
                         Product.getId(),
                         Product.getName(),
                         Product.getPrice(),
                         Product.getCategory()
-                ))
-                .toList();
+                ));
+
     }
 
     public ProductResponse getProductById(long id){
