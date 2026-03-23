@@ -1,68 +1,69 @@
 package com.example.SpringbootCore.exception;
 
+import com.example.SpringbootCore.dto.ApiResponse;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.security.access.AccessDeniedException;
+import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+    private final MessageSource messageSource;
+
+    private String getMessage(String key) {
+        Locale locale = LocaleContextHolder.getLocale();
+        return messageSource.getMessage(key, null, locale);
+    }
+
+    private String getMessage(String key, Object[] args) {
+        Locale locale = LocaleContextHolder.getLocale();
+        return messageSource.getMessage(key, args, locale);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String,Object>> handleValidationExceptions(MethodArgumentNotValidException ex){
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .toList();
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("code",ErrorCode.VALIDATION_FAILED.getCode());
-        body.put("status",400);
-        body.put("error","VALIDATION_FAILED");
-        body.put("message",errors);
-        return  ResponseEntity.badRequest().body(body);
-
+    public ResponseEntity<ApiResponse<Void>> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        String message = getMessage("error.validation_failed");
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.validation(message));
     }
 
     @ExceptionHandler(AppException.class)
-    public ResponseEntity<Map<String, Object>> handleAppException(AppException ex) {
-        return buildResponse(ex.getErrorCode(), ex.getMessage());
-    }
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-            return  buildResponse(ErrorCode.INTERNAL_ERROR,ErrorCode.INTERNAL_ERROR.getMessage());
-    }
-
-    private ResponseEntity<Map<String, Object>> buildResponse(ErrorCode errorCode, String message) {
-        Map<String , Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("code", errorCode.getCode());
-        body.put("status", errorCode.getHttpStatus().value());
-        body.put("error", errorCode.name());
-        body.put("message", message);
-        return ResponseEntity.status(errorCode.getHttpStatus()).body(body);
-
+    public ResponseEntity<ApiResponse<Void>> handleAppException(AppException ex) {
+        ErrorCode errorCode = ex.getErrorCode();
+        String key = "error." + errorCode.name().toLowerCase();
+        String message = getMessage(key);
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(ApiResponse.error(errorCode.getCode(), message));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("code", 403);
-        body.put("status", 403);
-        body.put("error", "FORBIDDEN");
-        body.put("message", "You do not have permission to access this resource");
-
-        return ResponseEntity.status(403).body(body);
+    public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(
+            AccessDeniedException ex) {
+        String message = getMessage("error.access_denied");
+        return ResponseEntity.status(403)
+                .body(ApiResponse.forbidden(message));
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEntityNotFound(
+            EntityNotFoundException ex) {
+        String message = getMessage("error.entity_not_found", new Object[]{ex.getEntity()});
+        return ResponseEntity.status(404)
+                .body(ApiResponse.notFound(message));
+    }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
+        String message = getMessage("error.internal_error");
+        return ResponseEntity.status(500)
+                .body(ApiResponse.exception(message));
+    }
 }
