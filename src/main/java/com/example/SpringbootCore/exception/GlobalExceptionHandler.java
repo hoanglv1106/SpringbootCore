@@ -1,6 +1,7 @@
 package com.example.SpringbootCore.exception;
 
 import com.example.SpringbootCore.dto.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Locale;
 
+@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -30,6 +32,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
+        log.warn("Validation failed: {}", ex.getMessage());
         String message = getMessage("error.validation_failed");
         return ResponseEntity.badRequest()
                 .body(ApiResponse.validation(message));
@@ -37,6 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiResponse<Void>> handleAppException(AppException ex) {
+        log.warn("AppException occurred: {}", ex.getMessage());
         ErrorCode errorCode = ex.getErrorCode();
         String key = "error." + errorCode.name().toLowerCase();
         String message = getMessage(key);
@@ -47,6 +51,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(
             AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
         String message = getMessage("error.access_denied");
         return ResponseEntity.status(403)
                 .body(ApiResponse.forbidden(message));
@@ -55,6 +60,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleEntityNotFound(
             EntityNotFoundException ex) {
+        log.warn("Entity not found: {}", ex.getMessage());
         String message = getMessage("error.entity_not_found", new Object[]{ex.getEntity()});
         return ResponseEntity.status(404)
                 .body(ApiResponse.notFound(message));
@@ -62,6 +68,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
+        log.error("Internal error: {}", ex.getMessage());
         String message = getMessage("error.internal_error");
         return ResponseEntity.status(500)
                 .body(ApiResponse.exception(message));
